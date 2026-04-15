@@ -9,7 +9,9 @@
     <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,200..800&family=Gochi+Hand&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="styles.css">
 </head>
-<body style="padding-top: 100px;">
+<body style="padding-top: 100px; background: transparent !important;">
+    <!-- Hyperspeed Background Container -->
+    <div id="hyperspeed-container" style="position: fixed; inset: 0; z-index: -10; background: #000; overflow: hidden;"></div>
     <!-- Intro Overlay -->
     <div id="intro-overlay" class="intro-overlay">
         <div class="intro-content">
@@ -102,5 +104,8 @@
     </footer>
 
     <script src="script.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/postprocessing@6.29.3/build/postprocessing.js"></script>
+    <script src="hyperspeed.js"></script>
 </body>
 </html>

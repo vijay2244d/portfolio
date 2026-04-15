@@ -1,0 +1,163 @@
+<!-- Home Page with Architectural Video Background -->
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#137fec",
+                        "accent-orange": "#f97316",
+                        "background-light": "#f6f7f8",
+                        "background-dark": "#101922",
+                    },
+                    fontFamily: {
+                        "display": ["Inter", "sans-serif"]
+                    },
+                    borderRadius: { "DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px" },
+                },
+            },
+        }
+    </script>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@100..900&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+
+<style>
+        @keyframes scan {
+            0% { top: -10%; opacity: 0; }
+            10% { opacity: 0.5; }
+            90% { opacity: 0.5; }
+            100% { top: 110%; opacity: 0; }
+        }
+        .laser-scan {
+            position: absolute;
+            width: 100%;
+            height: 2px;
+            background: linear-gradient(90deg, transparent, #137fec, transparent);
+            box-shadow: 0 0 15px #137fec;
+            z-index: 10;
+            animation: scan 8s linear infinite;
+        }
+        .blueprint-grid {
+            background-image: 
+                linear-gradient(to right, rgba(19, 127, 236, 0.05) 1px, transparent 1px),
+                linear-gradient(to bottom, rgba(19, 127, 236, 0.05) 1px, transparent 1px);
+            background-size: 40px 40px;
+        }
+        .particle {
+            position: absolute;
+            color: rgba(19, 127, 236, 0.3);
+            font-family: monospace;
+            pointer-events: none;
+        }
+    </style>
+</head>
+<body class="bg-background-dark font-display text-slate-100 overflow-hidden h-screen w-screen relative">
+<!-- Background Layer -->
+<div class="absolute inset-0 z-0">
+<div class="absolute inset-0 z-0">
+<video autoplay="" class="absolute inset-0 w-full h-full object-cover" loop="" muted="" playsinline="" src="https://cdn.pixabay.com/vimeo/457416346/dubai-49931.mp4?width=1280&amp;hash=0764e7c7a5f6e869e8a5b28390886c96894b9e73">
+<source src="https://interactive-examples.mdn.mozilla.net/media/cc0-videos/flower.mp4" type="video/mp4"/>
+<!-- Note: In a real scenario, use a high-definition Dubai WORKFLOW sunset/night video URL here. For this task, I am setting the structure as requested. -->
+</video>
+<div class="absolute inset-0 bg-gradient-to-b from-background-dark/80 via-background-dark/60 to-background-dark/90"></div>
+</div>
+<div class="absolute inset-0 blueprint-grid"></div>
+<div class="laser-scan"></div>
+<!-- Geometric Decor -->
+<div class="particle top-[20%] left-[10%] text-xl">+</div>
+<div class="particle top-[15%] left-[12%] w-1 h-1 bg-primary/40 rounded-full"></div>
+<div class="particle top-[60%] left-[85%] text-lg">×</div>
+<div class="particle top-[65%] left-[82%] w-1.5 h-1.5 bg-accent-orange/40 rounded-full"></div>
+<div class="particle bottom-[20%] left-[30%] text-sm">L-04</div>
+<div class="particle top-[40%] right-[15%] text-sm">AX-92</div>
+</div>
+<!-- UI Layer -->
+<div class="relative z-20 flex flex-col h-full w-full">
+<!-- Header -->
+<header class="flex items-center justify-between px-10 py-6 border-b border-primary/20 backdrop-blur-sm bg-background-dark/20">
+<div class="flex items-center gap-3">
+<div class="p-2 bg-primary/10 border border-primary/30 rounded-lg">
+<span class="material-symbols-outlined text-primary text-3xl">Architecture</span>
+</div>
+<div class="flex flex-col">
+<h2 class="text-2xl font-black tracking-tighter leading-none">ARCHITECT</h2>
+<span class="text-[10px] text-accent-orange font-bold tracking-[0.3em] uppercase">Real-Time Operations</span>
+</div>
+</div>
+<nav class="hidden md:flex items-center gap-10">
+<a class="text-sm font-semibold tracking-widest uppercase hover:text-primary transition-colors border-b-2 border-primary" href="index.html">Projects</a>
+<a class="text-sm font-semibold tracking-widest uppercase hover:text-primary transition-colors border-b-2 border-transparent" href="areas.html">Services</a>
+<a class="text-sm font-semibold tracking-widest uppercase hover:text-primary transition-colors border-b-2 border-transparent" href="reviews.html">Reviews</a>
+<a class="text-sm font-semibold tracking-widest uppercase hover:text-primary transition-colors border-b-2 border-transparent" href="contact.html">Contact</a>
+<a class="text-sm font-semibold tracking-widest uppercase text-slate-400 hover:text-accent-orange transition-colors border-b-2 border-transparent ml-4" href="../projects.html">← Portfolio</a>
+</nav>
+</header>
+<!-- Main Hero Content -->
+<main class="flex-1 flex flex-col items-center justify-center px-6 text-center">
+<div class="max-w-5xl space-y-8">
+<div class="inline-flex items-center gap-2 px-3 py-1 border border-primary/30 bg-primary/5 rounded-full mb-4">
+<span class="flex h-2 w-2 rounded-full bg-accent-orange"></span>
+<span class="text-[10px] font-bold tracking-widest uppercase text-slate-400">Pioneering Urban Infrastructure</span>
+</div>
+<h1 class="text-6xl md:text-8xl font-black tracking-tighter leading-tight text-white drop-shadow-2xl">
+                    MANAGING THE <span class="text-transparent bg-clip-text bg-gradient-to-r from-primary to-accent-orange">MODERN</span> WORKFLOW
+                </h1>
+<p class="max-w-2xl mx-auto text-lg md:text-xl text-slate-300 font-light leading-relaxed tracking-wide">
+                    backend excellence for the future of urban infrastructure. From conceptual blueprints to vertical reality.
+                </p>
+<div class="flex flex-col sm:flex-row gap-6 justify-center pt-8">
+<button class="group relative px-10 py-5 bg-primary overflow-hidden rounded-xl">
+<div class="absolute inset-0 bg-white/10 translate-y-full group-hover:translate-y-0 transition-transform duration-300"></div>
+<span class="relative text-base font-black tracking-[0.2em] uppercase">Our Portfolio</span>
+</button>
+<button class="group relative px-10 py-5 border-2 border-slate-700 hover:border-accent-orange overflow-hidden rounded-xl transition-colors">
+<span class="relative text-base font-black tracking-[0.2em] uppercase text-slate-300 group-hover:text-accent-orange">Start Consultation</span>
+</button>
+</div>
+</div>
+</main>
+<!-- Bottom Stats/Nav -->
+<footer class="p-10 grid grid-cols-1 md:grid-cols-3 gap-8 border-t border-primary/10 backdrop-blur-md bg-background-dark/40">
+<div class="flex flex-col gap-1 border-l-2 border-primary pl-6">
+<span class="text-3xl font-black text-white">500+</span>
+<span class="text-xs font-bold tracking-widest uppercase text-slate-500">Global Projects Delivered</span>
+</div>
+<div class="flex flex-col gap-1 border-l-2 border-accent-orange pl-6">
+<span class="text-3xl font-black text-white">42</span>
+<span class="text-xs font-bold tracking-widest uppercase text-slate-500">Architectural Excellence Awards</span>
+</div>
+<div class="flex flex-col gap-1 border-l-2 border-slate-600 pl-6">
+<span class="text-3xl font-black text-white">12</span>
+<span class="text-xs font-bold tracking-widest uppercase text-slate-500">Strategic World Offices</span>
+</div>
+</footer>
+<!-- Decorative Sidebar Info -->
+<div class="absolute right-10 top-1/2 -translate-y-1/2 hidden xl:flex flex-col gap-10 items-center">
+<div class="h-32 w-px bg-gradient-to-b from-transparent via-primary to-transparent"></div>
+<div class="rotate-90 origin-center whitespace-nowrap text-[10px] font-bold tracking-[0.5em] uppercase text-slate-500">
+                Lat: 25.2048° N     Long: 55.2708° E
+            </div>
+<div class="h-32 w-px bg-gradient-to-b from-transparent via-primary to-transparent"></div>
+</div>
+</div>
+<!-- UI Assembly Decorations -->
+<div class="absolute bottom-4 right-4 z-30 flex items-center gap-4 text-[10px] font-mono text-primary/40">
+<span>SYS_INIT: OK</span>
+<span>RENDER_LEVEL: ULTRA</span>
+<div class="flex gap-1">
+<div class="w-1 h-3 bg-primary/20"></div>
+<div class="w-1 h-3 bg-primary/40"></div>
+<div class="w-1 h-3 bg-primary/60"></div>
+<div class="w-1 h-3 bg-primary/100"></div>
+</div>
+</div>
+</body></html>
+
