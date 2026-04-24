@@ -316,10 +316,25 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Close mobile menu when a link is clicked
     links.forEach(link => {
-        link.addEventListener('click', () => {
-            if (navLinks.classList.contains('active')) {
-                navLinks.classList.remove('active');
-                hamburger.classList.remove('active');
+        link.addEventListener('click', function() {
+            const href = this.getAttribute('href');
+            const isPageTransition = href && href !== '#' && !href.startsWith('#') && !this.target;
+            
+            if (isPageTransition) {
+                // On mobile, keep the menu open for 1000ms so the wink emoji stays fully visible
+                // during the page transition delay.
+                setTimeout(() => {
+                    if (navLinks.classList.contains('active')) {
+                        navLinks.classList.remove('active');
+                        hamburger.classList.remove('active');
+                    }
+                }, 1000);
+            } else {
+                // For anchor/same-page links, close immediately
+                if (navLinks.classList.contains('active')) {
+                    navLinks.classList.remove('active');
+                    hamburger.classList.remove('active');
+                }
             }
         });
     });
