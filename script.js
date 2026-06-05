@@ -341,14 +341,17 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // 2. Sticky Header changing on scroll
     const header = document.querySelector('header');
+    const videoIntro = document.getElementById('video-intro');
     
     window.addEventListener('scroll', () => {
-        if (window.scrollY > 50) {
+        const threshold = videoIntro ? window.innerHeight - 80 : 50;
+        if (window.scrollY > threshold) {
             header.classList.add('scrolled');
         } else {
             header.classList.remove('scrolled');
         }
     });
+
 
     // 3. Smooth Scrolling for Anchor Links
     document.querySelectorAll('a[href^="#"]').forEach(anchor => {
@@ -572,4 +575,143 @@ document.addEventListener('DOMContentLoaded', () => {
             card.style.setProperty('--edge-proximity', '0');
         });
     });
+
+    // Biography Scroll Reveal Text Logic
+    const bioText = document.querySelector('.scroll-reveal-text');
+    if (bioText) {
+        const text = bioText.textContent.trim();
+        const words = text.split(/\s+/);
+        bioText.innerHTML = words.map(word => `<span class="word unrevealed">${word}</span>`).join(' ');
+        
+        const wordsElements = bioText.querySelectorAll('.word');
+        
+        const revealWords = () => {
+            const rect = bioText.getBoundingClientRect();
+            const windowHeight = window.innerHeight;
+            
+            // Adjust bounds: start reveal when paragraph enters from bottom, end when middle passes top
+            const startReveal = windowHeight * 0.85;
+            const endReveal = windowHeight * 0.15;
+            
+            const totalWords = wordsElements.length;
+            
+            // Calculate how far we scrolled through the trigger zone
+            let progress = (startReveal - rect.top) / (startReveal - endReveal);
+            progress = Math.min(Math.max(progress, 0), 1);
+            
+            const wordsToReveal = Math.floor(progress * totalWords);
+            
+            wordsElements.forEach((wordSpan, index) => {
+                if (index < wordsToReveal) {
+                    wordSpan.classList.remove('unrevealed');
+                    wordSpan.classList.add('revealed');
+                    wordSpan.classList.remove('active-word');
+                } else if (index === wordsToReveal && progress < 1 && progress > 0) {
+                    wordSpan.classList.remove('unrevealed');
+                    wordSpan.classList.add('revealed');
+                    wordSpan.classList.add('active-word');
+                } else {
+                    wordSpan.classList.add('unrevealed');
+                    wordSpan.classList.remove('revealed');
+                    wordSpan.classList.remove('active-word');
+                }
+            });
+        };
+        
+        // Add scroll and resize listeners
+        window.addEventListener('scroll', revealWords, { passive: true });
+        window.addEventListener('resize', revealWords, { passive: true });
+        
+        // Initial trigger
+        revealWords();
+    }
+
+    // --- FULL-SCREEN BIO VIDEO CONTROLS --- //
+    const bioVideo = document.getElementById('hero-bio-video');
+    const heroPlayBtn = document.getElementById('hero-video-play');
+    const heroMuteBtn = document.getElementById('hero-video-mute');
+
+    if (bioVideo) {
+        // Toggle Play/Pause
+        const togglePlay = (e) => {
+            if (e) e.stopPropagation();
+            const playIcon = heroPlayBtn.querySelector('.play-icon');
+            const pauseIcon = heroPlayBtn.querySelector('.pause-icon');
+            
+            if (bioVideo.paused || bioVideo.ended) {
+                if (bioVideo.ended) {
+                    bioVideo.currentTime = 0; // Restart video on replay/resume
+                }
+                bioVideo.play();
+                heroPlayBtn.setAttribute('aria-label', 'Pause');
+                if (playIcon) playIcon.style.display = 'none';
+                if (pauseIcon) pauseIcon.style.display = 'block';
+            } else {
+                bioVideo.pause();
+                heroPlayBtn.setAttribute('aria-label', 'Play');
+                if (playIcon) playIcon.style.display = 'block';
+                if (pauseIcon) pauseIcon.style.display = 'none';
+            }
+        };
+
+        // Toggle Mute/Unmute
+        const toggleMute = (e) => {
+            if (e) e.stopPropagation();
+            const muteIcon = heroMuteBtn.querySelector('.mute-icon');
+            const unmuteIcon = heroMuteBtn.querySelector('.unmute-icon');
+            
+            bioVideo.muted = !bioVideo.muted;
+            if (bioVideo.muted) {
+                heroMuteBtn.setAttribute('aria-label', 'Unmute');
+                if (muteIcon) muteIcon.style.display = 'block';
+                if (unmuteIcon) unmuteIcon.style.display = 'none';
+            } else {
+                heroMuteBtn.setAttribute('aria-label', 'Mute');
+                if (muteIcon) muteIcon.style.display = 'none';
+                if (unmuteIcon) unmuteIcon.style.display = 'block';
+            }
+        };
+
+        if (heroPlayBtn) heroPlayBtn.addEventListener('click', togglePlay);
+        if (heroMuteBtn) heroMuteBtn.addEventListener('click', toggleMute);
+
+        // When video ends naturally, reset layout to play/resume state
+        bioVideo.addEventListener('ended', () => {
+            heroPlayBtn.setAttribute('aria-label', 'Resume');
+            const playIcon = heroPlayBtn.querySelector('.play-icon');
+            const pauseIcon = heroPlayBtn.querySelector('.pause-icon');
+            if (playIcon) playIcon.style.display = 'block';
+            if (pauseIcon) pauseIcon.style.display = 'none';
+        });
+
+        // Automatic unmute on first visitor interaction (click, scroll, keydown)
+        const unmuteOnFirstInteraction = () => {
+            if (bioVideo.muted) {
+                bioVideo.muted = false;
+                if (heroMuteBtn) {
+                    const muteIcon = heroMuteBtn.querySelector('.mute-icon');
+                    const unmuteIcon = heroMuteBtn.querySelector('.unmute-icon');
+                    heroMuteBtn.setAttribute('aria-label', 'Mute');
+                    if (muteIcon) muteIcon.style.display = 'none';
+                    if (unmuteIcon) unmuteIcon.style.display = 'block';
+                }
+            }
+            // Remove listeners immediately
+            window.removeEventListener('click', unmuteOnFirstInteraction, { passive: true });
+            window.removeEventListener('scroll', unmuteOnFirstInteraction, { passive: true });
+            window.removeEventListener('keydown', unmuteOnFirstInteraction, { passive: true });
+        };
+
+        window.addEventListener('click', unmuteOnFirstInteraction, { passive: true });
+        window.addEventListener('scroll', unmuteOnFirstInteraction, { passive: true });
+        window.addEventListener('keydown', unmuteOnFirstInteraction, { passive: true });
+
+        // Click on the empty space of the hero landing screen to play/pause
+        const heroSection = document.getElementById('hero');
+        if (heroSection) {
+            heroSection.addEventListener('click', (e) => {
+                togglePlay(e);
+            });
+        }
+    }
 });
