@@ -1,0 +1,686 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=1200">
+    <title>Certificate Censor Tool - Antigravity</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,200..800&display=swap" rel="stylesheet">
+    
+    <!-- Load pdf.js -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.min.js"></script>
+
+    <style>
+        :root {
+            --bg-dark: #0d1117;
+            --bg-card: rgba(22, 27, 34, 0.85);
+            --border-color: rgba(255, 255, 255, 0.1);
+            --primary: #bb86fc;
+            --secondary: #03dac6;
+            --text-main: #e6edf3;
+            --text-muted: #8b949e;
+            --font-main: 'Bricolage Grotesque', sans-serif;
+            --gradient: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: var(--font-main);
+            background-color: var(--bg-dark);
+            color: var(--text-main);
+            overflow: hidden;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        header {
+            background: rgba(13, 17, 23, 0.8);
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid var(--border-color);
+            padding: 1rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            z-index: 10;
+        }
+
+        header h1 {
+            font-size: 1.5rem;
+            background: var(--gradient);
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+            font-weight: 700;
+        }
+
+        .container {
+            display: flex;
+            flex: 1;
+            overflow: hidden;
+        }
+
+        .sidebar {
+            width: 320px;
+            background: rgba(22, 27, 34, 0.5);
+            border-right: 1px solid var(--border-color);
+            padding: 1.5rem;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        .sidebar h2 {
+            font-size: 1.1rem;
+            color: var(--primary);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 0.5rem;
+        }
+
+        .cert-item {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 0.8rem 1rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-align: left;
+        }
+
+        .cert-item:hover {
+            border-color: var(--primary);
+            background: rgba(187, 134, 252, 0.05);
+        }
+
+        .cert-item.active {
+            border-color: var(--secondary);
+            background: rgba(3, 218, 198, 0.08);
+            box-shadow: 0 0 10px rgba(3, 218, 198, 0.2);
+        }
+
+        .cert-item.saved {
+            border-color: #2ea44f;
+            background: rgba(46, 164, 79, 0.08);
+        }
+
+        .cert-item-title {
+            font-weight: 600;
+            font-size: 0.95rem;
+            margin-bottom: 0.2rem;
+        }
+
+        .cert-item-meta {
+            font-size: 0.8rem;
+            color: var(--text-muted);
+        }
+
+        .editor-area {
+            flex: 1;
+            padding: 2rem;
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .canvas-container {
+            border: 2px dashed var(--border-color);
+            border-radius: 12px;
+            background: #060010;
+            overflow: auto;
+            max-width: 100%;
+            max-height: 80%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.5);
+        }
+
+        #editor-canvas {
+            display: block;
+            max-width: none;
+            max-height: none;
+            cursor: crosshair;
+        }
+
+        .toolbar {
+            display: flex;
+            gap: 1rem;
+            align-items: center;
+            justify-content: center;
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            padding: 0.8rem 1.5rem;
+            border-radius: 40px;
+            backdrop-filter: blur(12px);
+            box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+            z-index: 5;
+        }
+
+        .btn {
+            padding: 0.6rem 1.5rem;
+            border-radius: 20px;
+            font-family: var(--font-main);
+            font-weight: 600;
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: none;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .btn-primary {
+            background: var(--gradient);
+            color: #fff;
+            box-shadow: 0 4px 10px rgba(187, 134, 252, 0.2);
+        }
+
+        .btn-primary:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 15px rgba(187, 134, 252, 0.4);
+        }
+
+        .btn-secondary {
+            background: rgba(255,255,255,0.05);
+            color: var(--text-main);
+            border: 1px solid var(--border-color);
+        }
+
+        .btn-secondary:hover:not(:disabled) {
+            background: rgba(255,255,255,0.1);
+            border-color: var(--text-main);
+        }
+
+        .btn:disabled {
+            opacity: 0.4;
+            cursor: not-allowed;
+        }
+
+        .instructions {
+            position: absolute;
+            top: 2rem;
+            background: rgba(13, 17, 23, 0.85);
+            border: 1px solid var(--border-color);
+            padding: 0.8rem 1.5rem;
+            border-radius: 10px;
+            max-width: 500px;
+            text-align: center;
+            font-size: 0.9rem;
+            color: var(--text-muted);
+            pointer-events: none;
+            backdrop-filter: blur(5px);
+            transition: opacity 0.3s ease;
+        }
+
+        .status-msg {
+            position: fixed;
+            bottom: 2rem;
+            right: 2rem;
+            padding: 1rem 2rem;
+            border-radius: 12px;
+            background: #2ea44f;
+            color: white;
+            font-weight: 600;
+            box-shadow: 0 8px 24px rgba(46,164,79,0.3);
+            transform: translateY(150%);
+            transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            z-index: 100;
+        }
+
+        .status-msg.visible {
+            transform: translateY(0);
+        }
+
+        .status-msg.error {
+            background: #da3637;
+            box-shadow: 0 8px 24px rgba(218,54,55,0.3);
+        }
+
+        .loader {
+            border: 3px solid rgba(255,255,255,0.1);
+            border-radius: 50%;
+            border-top: 3px solid var(--primary);
+            width: 24px;
+            height: 24px;
+            animation: spin 1s linear infinite;
+            display: inline-block;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        #loading-overlay {
+            position: absolute;
+            inset: 0;
+            background: rgba(13, 17, 23, 0.7);
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+            align-items: center;
+            justify-content: center;
+            z-index: 8;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s ease;
+        }
+
+        #loading-overlay.visible {
+            opacity: 1;
+            pointer-events: auto;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>Portfolio Certificate Censor Tool</h1>
+        <div>
+            <span>Status: Running on Port 8080</span>
+        </div>
+    </header>
+
+    <div class="container">
+        <div class="sidebar">
+            <h2>Certificates</h2>
+            <div id="cert-list">
+                <!-- Loaded dynamically -->
+            </div>
+        </div>
+
+        <div class="editor-area">
+            <div class="instructions" id="instruction-box">
+                💡 Select a certificate, then <strong>click and drag</strong> on the canvas to select the Registration No, QR code, or Certificate No to mosaic.
+            </div>
+
+            <div class="canvas-container" id="canvas-wrapper">
+                <canvas id="editor-canvas"></canvas>
+                <div id="loading-overlay">
+                    <div class="loader"></div>
+                    <div id="loading-text">Loading Certificate...</div>
+                </div>
+            </div>
+
+            <div class="toolbar">
+                <button class="btn btn-secondary" id="btn-clear" disabled>Clear Selections</button>
+                <button class="btn btn-primary" id="btn-mosaic" disabled>Apply Pixelation</button>
+                <button class="btn btn-primary" id="btn-save" style="background: #2ea44f; box-shadow: 0 4px 10px rgba(46,164,79,0.2);" disabled>Save Censored Version</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="status-msg" id="status-notification">
+        File saved successfully!
+    </div>
+
+    <script>
+        // Set up pdf.js worker from CDN
+        pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.worker.min.js';
+
+        const certificates = [
+            { id: 1, name: "cert1.jpg", title: "Typewriting English (45 WPM)", issuer: "Govt of Tamil Nadu", type: "image" },
+            { id: 2, name: "cert2.jpg", title: "Typewriting Tamil (30 WPM)", issuer: "Govt of Tamil Nadu", type: "image" },
+            { id: 3, name: "cert3.jpg", title: "Typewriting English (30 WPM)", issuer: "Govt of Tamil Nadu", type: "image" },
+            { id: 4, name: "cert4.jpg", title: "CPBFI Program", issuer: "Bajaj Finserv Limited", type: "image" },
+            { id: 5, name: "cert5.jpg", title: "HR Workshop", issuer: "Bajaj Finserv Limited", type: "image" },
+            { id: 6, name: "cert6.jpg", title: "GST & Accounting", issuer: "The Madura College", type: "image" },
+            { id: 7, name: "cert7.pdf", title: "Data Science Using Python", issuer: "Aligarh Muslim Univ (Swayam)", type: "pdf" },
+            { id: 8, name: "cert8.pdf", title: "Power BI for Beginners", issuer: "Simplilearn & Microsoft", type: "pdf" },
+            { id: 9, name: "cert9.pdf", title: "Claude Code 101", issuer: "Anthropic", type: "pdf" }
+        ];
+
+        let activeCert = null;
+        let originalImage = null; // Holds the loaded image or rendered PDF canvas
+        let rectangles = []; // Holds the user drawn redaction boxes {x, y, w, h}
+        let isDrawing = false;
+        let startX, startY;
+        let currentX, currentY;
+
+        const canvas = document.getElementById('editor-canvas');
+        const ctx = canvas.getContext('2d');
+        const certListContainer = document.getElementById('cert-list');
+        const clearBtn = document.getElementById('btn-clear');
+        const mosaicBtn = document.getElementById('btn-mosaic');
+        const saveBtn = document.getElementById('btn-save');
+        const loadingOverlay = document.getElementById('loading-overlay');
+        const loadingText = document.getElementById('loading-text');
+        const instructionBox = document.getElementById('instruction-box');
+        const statusNotification = document.getElementById('status-notification');
+
+        // Render certificate list sidebar
+        function initSidebar() {
+            certListContainer.innerHTML = '';
+            certificates.forEach(cert => {
+                const item = document.createElement('div');
+                item.className = 'cert-item';
+                item.id = `cert-item-${cert.id}`;
+                item.innerHTML = `
+                    <div class="cert-item-title">${cert.title}</div>
+                    <div class="cert-item-meta">${cert.issuer} • ${cert.name}</div>
+                `;
+                item.addEventListener('click', () => loadCertificate(cert));
+                certListContainer.appendChild(item);
+            });
+        }
+
+        // Show a temporary status notification
+        function showNotification(msg, isError = false) {
+            statusNotification.innerText = msg;
+            if (isError) {
+                statusNotification.classList.add('error');
+            } else {
+                statusNotification.classList.remove('error');
+            }
+            statusNotification.classList.add('visible');
+            setTimeout(() => {
+                statusNotification.classList.remove('visible');
+            }, 3000);
+        }
+
+        // Load image or PDF into canvas editor
+        async function loadCertificate(cert) {
+            if (activeCert && activeCert.id === cert.id) return;
+            
+            // Highlight in sidebar
+            document.querySelectorAll('.cert-item').forEach(el => el.classList.remove('active'));
+            document.getElementById(`cert-item-${cert.id}`).classList.add('active');
+
+            activeCert = cert;
+            rectangles = [];
+            updateButtons();
+            
+            loadingText.innerText = "Loading Certificate...";
+            loadingOverlay.classList.add('visible');
+            instructionBox.style.opacity = '0';
+
+            const filePath = `images/certifications/${cert.name}`;
+
+            try {
+                if (cert.type === 'image') {
+                    originalImage = new Image();
+                    originalImage.src = filePath;
+                    originalImage.onload = () => {
+                        renderBaseImage();
+                        loadingOverlay.classList.remove('visible');
+                        instructionBox.style.opacity = '1';
+                    };
+                    originalImage.onerror = () => {
+                        throw new Error(`Failed to load image at ${filePath}`);
+                    };
+                } else if (cert.type === 'pdf') {
+                    // Load PDF using pdf.js
+                    const loadingTask = pdfjsLib.getDocument(filePath);
+                    const pdf = await loadingTask.promise;
+                    const page = await pdf.getPage(1);
+                    
+                    // Render PDF to a temporary canvas first at high DPI (e.g. scale 1.5 or 2)
+                    const viewport = page.getViewport({ scale: 1.5 });
+                    const tempCanvas = document.createElement('canvas');
+                    const tempCtx = tempCanvas.getContext('2d');
+                    tempCanvas.width = viewport.width;
+                    tempCanvas.height = viewport.height;
+                    
+                    await page.render({
+                        canvasContext: tempCtx,
+                        viewport: viewport
+                    }).promise;
+
+                    // Store temporary canvas as the image source
+                    originalImage = tempCanvas;
+                    renderBaseImage();
+                    loadingOverlay.classList.remove('visible');
+                    instructionBox.style.opacity = '1';
+                }
+            } catch (err) {
+                console.error(err);
+                loadingOverlay.classList.remove('visible');
+                showNotification(`Error: Could not load ${cert.name}. Ensure it downloaded successfully.`, true);
+            }
+        }
+
+        // Draw the image/canvas on the main editor canvas
+        function renderBaseImage() {
+            if (!originalImage) return;
+            
+            // Set canvas size matching the image/pdf dimensions
+            canvas.width = originalImage.width;
+            canvas.height = originalImage.height;
+            
+            // Draw it
+            ctx.drawImage(originalImage, 0, 0);
+            
+            // Draw any rectangles
+            drawRectangles();
+        }
+
+        // Draw rectangles and highlights
+        function drawRectangles() {
+            // Draw current selections (red translucent boxes)
+            rectangles.forEach((rect, index) => {
+                ctx.fillStyle = 'rgba(255, 0, 0, 0.35)';
+                ctx.fillRect(rect.x, rect.y, rect.w, rect.h);
+                
+                ctx.strokeStyle = '#ff0000';
+                ctx.lineWidth = 2;
+                ctx.strokeRect(rect.x, rect.y, rect.w, rect.h);
+                
+                // Label box
+                ctx.fillStyle = '#ff0000';
+                ctx.font = 'bold 12px sans-serif';
+                ctx.fillText(`Area ${index + 1}`, rect.x + 5, rect.y + 15);
+            });
+
+            // Draw active rectangle while dragging
+            if (isDrawing) {
+                const w = currentX - startX;
+                const h = currentY - startY;
+                ctx.fillStyle = 'rgba(187, 134, 252, 0.3)';
+                ctx.fillRect(startX, startY, w, h);
+                ctx.strokeStyle = '#bb86fc';
+                ctx.lineWidth = 1.5;
+                ctx.strokeRect(startX, startY, w, h);
+            }
+        }
+
+        // Pixelate (mosaic) the specified rectangle in canvas
+        function pixelateRect(x, y, w, h, blockSize = 12) {
+            // Read image data from coordinates
+            const imgData = ctx.getImageData(x, y, w, h);
+            const data = imgData.data;
+
+            // Loop through blocks
+            for (let r = 0; r < h; r += blockSize) {
+                for (let c = 0; c < w; c += blockSize) {
+                    
+                    // 1. Calculate average color in this block
+                    let red = 0, green = 0, blue = 0, count = 0;
+                    
+                    for (let dy = 0; dy < blockSize && (r + dy) < h; dy++) {
+                        for (let dx = 0; dx < blockSize && (c + dx) < w; dx++) {
+                            const offset = ((r + dy) * w + (c + dx)) * 4;
+                            red += data[offset];
+                            green += data[offset + 1];
+                            blue += data[offset + 2];
+                            count++;
+                        }
+                    }
+                    
+                    const avgRed = Math.floor(red / count);
+                    const avgGreen = Math.floor(green / count);
+                    const avgBlue = Math.floor(blue / count);
+                    
+                    // 2. Write average color back to block pixels
+                    for (let dy = 0; dy < blockSize && (r + dy) < h; dy++) {
+                        for (let dx = 0; dx < blockSize && (c + dx) < w; dx++) {
+                            const offset = ((r + dy) * w + (c + dx)) * 4;
+                            data[offset] = avgRed;
+                            data[offset + 1] = avgGreen;
+                            data[offset + 2] = avgBlue;
+                        }
+                    }
+                }
+            }
+
+            // Write modified image data back
+            ctx.putImageData(imgData, x, y);
+        }
+
+        // Mouse canvas drag handlers
+        canvas.addEventListener('mousedown', (e) => {
+            if (!activeCert || !originalImage) return;
+            isDrawing = true;
+            
+            const rect = canvas.getBoundingClientRect();
+            // Translate client coordinates to canvas dimensions
+            const scaleX = canvas.width / rect.width;
+            const scaleY = canvas.height / rect.height;
+            
+            startX = (e.clientX - rect.left) * scaleX;
+            startY = (e.clientY - rect.top) * scaleY;
+            currentX = startX;
+            currentY = startY;
+        });
+
+        canvas.addEventListener('mousemove', (e) => {
+            if (!isDrawing) return;
+            
+            const rect = canvas.getBoundingClientRect();
+            const scaleX = canvas.width / rect.width;
+            const scaleY = canvas.height / rect.height;
+            
+            currentX = (e.clientX - rect.left) * scaleX;
+            currentY = (e.clientY - rect.top) * scaleY;
+            
+            // Redraw image and rectangles
+            ctx.drawImage(originalImage, 0, 0);
+            
+            // Draw existing pixelated boxes (if they were already committed)
+            // But right now we commit them all at once when clicking "Apply Pixelation"
+            drawRectangles();
+        });
+
+        canvas.addEventListener('mouseup', () => {
+            if (!isDrawing) return;
+            isDrawing = false;
+            
+            // Save the rectangle (in correct direction)
+            const x = Math.min(startX, currentX);
+            const y = Math.min(startY, currentY);
+            const w = Math.abs(currentX - startX);
+            const h = Math.abs(currentY - startY);
+            
+            if (w > 5 && h > 5) {
+                rectangles.push({ x, y, w, h });
+            }
+            
+            // Redraw
+            ctx.drawImage(originalImage, 0, 0);
+            drawRectangles();
+            updateButtons();
+        });
+
+        // Button action updates
+        function updateButtons() {
+            const hasRects = rectangles.length > 0;
+            clearBtn.disabled = !hasRects;
+            mosaicBtn.disabled = !hasRects;
+            saveBtn.disabled = !activeCert;
+        }
+
+        // Clear button
+        clearBtn.addEventListener('click', () => {
+            rectangles = [];
+            ctx.drawImage(originalImage, 0, 0);
+            updateButtons();
+        });
+
+        // Mosaic button (Apply pixelation)
+        mosaicBtn.addEventListener('click', () => {
+            if (rectangles.length === 0) return;
+            
+            // Restore original clean image first (to overwrite red highlight rectangles)
+            ctx.drawImage(originalImage, 0, 0);
+            
+            // Apply pixelation to all regions
+            rectangles.forEach(rect => {
+                pixelateRect(rect.x, rect.y, rect.w, rect.h, 15);
+            });
+            
+            // Clear redaction rectangles list so they aren't drawn again
+            rectangles = [];
+            updateButtons();
+            
+            // Save current canvas state as the new "originalImage" so you can stack edits if needed
+            const tempCanvas = document.createElement('canvas');
+            tempCanvas.width = canvas.width;
+            tempCanvas.height = canvas.height;
+            tempCanvas.getContext('2d').drawImage(canvas, 0, 0);
+            originalImage = tempCanvas;
+            
+            showNotification("Pixelation applied! You can add more areas or click Save.");
+        });
+
+        // Save button (Send base64 to server)
+        saveBtn.addEventListener('click', async () => {
+            if (!activeCert) return;
+            
+            // Convert canvas to jpeg format
+            const dataUrl = canvas.toDataURL('image/jpeg', 0.92);
+            
+            // The saved file will always be a JPEG image (even if the source was a PDF),
+            // so we rename .pdf files to _censored.jpg
+            const baseName = activeCert.name.replace(/\.[^/.]+$/, ""); // strip extension
+            const targetFilename = `${baseName}_censored.jpg`;
+            
+            saveBtn.disabled = true;
+            saveBtn.innerText = "Saving...";
+            
+            try {
+                const response = await fetch('/api/save', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        filename: targetFilename,
+                        image: dataUrl
+                    })
+                });
+                
+                const result = await response.json();
+                if (response.ok) {
+                    showNotification(`Saved: images/certifications/${targetFilename}!`);
+                    
+                    // Mark as saved in sidebar
+                    document.getElementById(`cert-item-${activeCert.id}`).classList.add('saved');
+                } else {
+                    throw new Error(result.error || 'Server error');
+                }
+            } catch (err) {
+                console.error(err);
+                showNotification(`Failed to save certificate: ${err.message}`, true);
+            } finally {
+                saveBtn.disabled = false;
+                saveBtn.innerText = "Save Censored Version";
+            }
+        });
+
+        // Start
+        initSidebar();
+    </script>
+</body>
+</html>

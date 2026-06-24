@@ -19,11 +19,12 @@
 
 html {
     scroll-behavior: auto; /* Disabled for Lenis to handle smooth scrolling */
+    background-color: var(--bg-dark);
 }
 
 body {
     font-family: var(--font-main);
-    background-color: var(--bg-dark);
+    background-color: transparent;
     color: var(--text-main);
     line-height: 1.6;
     overflow-x: hidden;
@@ -1378,4 +1379,205 @@ footer {
     }
 }
 
+/* --- PROJECTS LOCK SCREEN STYLES --- */
+.lock-screen-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: rgba(13, 17, 23, 0.96);
+    backdrop-filter: blur(25px);
+    -webkit-backdrop-filter: blur(25px);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 100000;
+    opacity: 1;
+    visibility: visible;
+    transition: opacity 0.5s cubic-bezier(0.4, 0, 0.2, 1), visibility 0.5s;
+}
 
+.lock-screen-overlay.unlocked {
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+}
+
+.lock-card {
+    position: relative;
+    background: rgba(22, 27, 34, 0.6);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    box-shadow: 0 24px 64px rgba(0, 0, 0, 0.6), inset 0 0 20px rgba(255, 255, 255, 0.02);
+    border-radius: 24px;
+    padding: 3.5rem 2.5rem;
+    width: 90%;
+    max-width: 440px;
+    text-align: center;
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275), box-shadow 0.4s ease;
+}
+
+.lock-card::before {
+    content: '';
+    position: absolute;
+    top: -1px;
+    left: -1px;
+    right: -1px;
+    bottom: -1px;
+    background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+    border-radius: 24px;
+    z-index: -1;
+    opacity: 0.15;
+    transition: opacity 0.3s ease;
+}
+
+.lock-card:hover::before {
+    opacity: 0.35;
+}
+
+.lock-card.shake {
+    animation: shake 0.5s cubic-bezier(.36,.07,.19,.97) both;
+}
+
+.lock-card.success-unlock {
+    animation: lockFadeZoom 0.6s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+}
+
+.lock-icon-container {
+    width: 70px;
+    height: 70px;
+    background: rgba(187, 134, 252, 0.1);
+    border: 1px solid rgba(187, 134, 252, 0.3);
+    border-radius: 50%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin: 0 auto 1.5rem;
+    color: var(--primary);
+    box-shadow: 0 0 20px rgba(187, 134, 252, 0.1);
+    animation: pulseLock 3s infinite alternate;
+}
+
+@keyframes pulseLock {
+    0% { transform: scale(1); box-shadow: 0 0 15px rgba(187, 134, 252, 0.15); }
+    100% { transform: scale(1.05); box-shadow: 0 0 30px rgba(187, 134, 252, 0.3); }
+}
+
+.lock-card h2 {
+    font-size: 1.8rem;
+    margin-bottom: 0.75rem;
+    background: var(--gradient);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    font-weight: 700;
+}
+
+.lock-card p {
+    color: var(--text-muted);
+    font-size: 0.95rem;
+    margin-bottom: 2rem;
+    line-height: 1.5;
+}
+
+.passcode-form {
+    display: flex;
+    flex-direction: column;
+    gap: 1.25rem;
+}
+
+.passcode-input-wrapper {
+    position: relative;
+    width: 100%;
+}
+
+.passcode-input {
+    width: 100%;
+    padding: 1.1rem 3rem 1.1rem 1.5rem;
+    border-radius: 12px;
+    background: rgba(255, 255, 255, 0.04);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    color: var(--text-main);
+    font-family: var(--font-main);
+    font-size: 1.1rem;
+    letter-spacing: 0.15em;
+    text-align: center;
+    transition: all 0.3s ease;
+}
+
+.passcode-input:focus {
+    outline: none;
+    border-color: var(--primary);
+    background: rgba(187, 134, 252, 0.02);
+    box-shadow: 0 0 15px rgba(187, 134, 252, 0.15);
+}
+
+.show-hide-btn {
+    position: absolute;
+    right: 15px;
+    top: 50%;
+    transform: translateY(-50%);
+    background: transparent;
+    border: none;
+    color: var(--text-muted);
+    font-size: 1.2rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: color 0.3s ease;
+}
+
+.show-hide-btn:hover {
+    color: var(--primary);
+}
+
+.unlock-btn {
+    width: 100%;
+    padding: 1.1rem;
+    border-radius: 12px;
+    font-weight: 700;
+    font-size: 1.05rem;
+    background: var(--gradient);
+    color: #fff;
+    border: none;
+    box-shadow: 0 4px 15px rgba(187, 134, 252, 0.3);
+    transition: all 0.3s ease;
+}
+
+.unlock-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(187, 134, 252, 0.5);
+}
+
+.unlock-btn:active {
+    transform: translateY(0);
+}
+
+.lock-error-msg {
+    color: #ff6b6b;
+    font-size: 0.88rem;
+    margin-top: -0.5rem;
+    min-height: 20px;
+    opacity: 0;
+    transform: translateY(-5px);
+    transition: all 0.3s ease;
+}
+
+.lock-error-msg.visible {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+@keyframes shake {
+    10%, 90% { transform: translate3d(-1px, 0, 0); }
+    20%, 80% { transform: translate3d(2px, 0, 0); }
+    30%, 50%, 70% { transform: translate3d(-4px, 0, 0); }
+    40%, 60% { transform: translate3d(4px, 0, 0); }
+}
+
+@keyframes lockFadeZoom {
+    0% { transform: scale(1); opacity: 1; filter: blur(0); }
+    100% { transform: scale(0.9); opacity: 0; filter: blur(10px); }
+}

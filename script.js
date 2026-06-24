@@ -1,5 +1,117 @@
 document.addEventListener('DOMContentLoaded', () => {
 
+    // --- PROJECTS LOCK SYSTEM --- //
+    const LOCK_CODE_HASH = '158a323a7ba44870f23d96f1516dd70aa48e9a72db4ebb026b0a89e212a208ab'; // SHA-256 for '2026'
+
+    async function sha256(message) {
+        const msgBuffer = new TextEncoder().encode(message);
+        const hashBuffer = await crypto.subtle.digest('SHA-256', msgBuffer);
+        const hashArray = Array.from(new Uint8Array(hashBuffer));
+        return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+    }
+
+    const isProjectsPage = window.location.href.includes('projects.html');
+    if (isProjectsPage && sessionStorage.getItem('portfolio_projects_unlocked') !== 'true') {
+        // Create the lock overlay element dynamically
+        const lockOverlay = document.createElement('div');
+        lockOverlay.className = 'lock-screen-overlay';
+        lockOverlay.innerHTML = `
+            <div class="lock-card">
+                <div class="lock-icon-container">
+                    <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
+                        <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+                    </svg>
+                </div>
+                <h2>Projects Locked</h2>
+                <p>Enter the access code to unlock and view the portfolio projects.</p>
+                <form class="passcode-form" id="lock-form" autocomplete="off">
+                    <div class="passcode-input-wrapper">
+                        <input type="password" class="passcode-input" id="passcode-input" placeholder="••••" required autofocus>
+                        <button type="button" class="show-hide-btn" id="show-hide-pwd" aria-label="Toggle password visibility">
+                            <svg class="eye-off-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"></path>
+                                <line x1="1" y1="1" x2="23" y2="23"></line>
+                            </svg>
+                            <svg class="eye-icon" style="display: none;" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+                                <circle cx="12" cy="12" r="3"></circle>
+                            </svg>
+                        </button>
+                    </div>
+                    <div class="lock-error-msg" id="lock-error"></div>
+                    <button type="submit" class="unlock-btn" id="unlock-submit-btn">Unlock Projects</button>
+                </form>
+            </div>
+        `;
+        document.body.appendChild(lockOverlay);
+
+        // Disable scrolling on body while locked
+        document.body.style.overflow = 'hidden';
+
+        const form = lockOverlay.querySelector('#lock-form');
+        const input = lockOverlay.querySelector('#passcode-input');
+        const errorMsg = lockOverlay.querySelector('#lock-error');
+        const card = lockOverlay.querySelector('.lock-card');
+        const showHideBtn = lockOverlay.querySelector('#show-hide-pwd');
+        const submitBtn = lockOverlay.querySelector('#unlock-submit-btn');
+
+        // Toggle password visibility
+        showHideBtn.addEventListener('click', () => {
+            const eyeIcon = showHideBtn.querySelector('.eye-icon');
+            const eyeOffIcon = showHideBtn.querySelector('.eye-off-icon');
+            if (input.type === 'password') {
+                input.type = 'text';
+                eyeIcon.style.display = 'block';
+                eyeOffIcon.style.display = 'none';
+            } else {
+                input.type = 'password';
+                eyeIcon.style.display = 'none';
+                eyeOffIcon.style.display = 'block';
+            }
+        });
+
+        form.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const code = input.value;
+            
+            // Show loading state
+            submitBtn.innerText = 'Verifying...';
+            submitBtn.disabled = true;
+            errorMsg.classList.remove('visible');
+            card.classList.remove('shake');
+
+            // Hash and check
+            const hashedInput = await sha256(code);
+            
+            setTimeout(() => {
+                if (hashedInput === LOCK_CODE_HASH) {
+                    sessionStorage.setItem('portfolio_projects_unlocked', 'true');
+                    card.classList.add('success-unlock');
+                    
+                    setTimeout(() => {
+                        lockOverlay.classList.add('unlocked');
+                        document.body.style.overflow = '';
+                        if (window.lenis) {
+                            window.lenis.start();
+                        }
+                        setTimeout(() => {
+                            lockOverlay.remove();
+                        }, 500);
+                    }, 600);
+                } else {
+                    submitBtn.innerText = 'Unlock Projects';
+                    submitBtn.disabled = false;
+                    errorMsg.innerText = 'Invalid access code. Please try again.';
+                    errorMsg.classList.add('visible');
+                    card.classList.add('shake');
+                    input.value = '';
+                    input.focus();
+                }
+            }, 400);
+        });
+    }
+
     // --- MOTION STYLE UI UPGRADE --- //
 
     // 1. Inject Lenis for Smooth Scrolling
@@ -19,6 +131,11 @@ document.addEventListener('DOMContentLoaded', () => {
             touchMultiplier: 2,
             infinite: false,
         });
+
+        window.lenis = lenis;
+        if (isProjectsPage && sessionStorage.getItem('portfolio_projects_unlocked') !== 'true') {
+            lenis.stop();
+        }
 
         function raf(time) {
             lenis.raf(time);

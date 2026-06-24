@@ -1,0 +1,1243 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=1200">
+    <title>Certifications - M. Vijay</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,200..800&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+    
+    <!-- Pure vanilla WebGL (no external library needed) -->
+    
+    <!-- SEO Optimization -->
+    <meta name="description" content="Professional certifications held by M. Vijay, covering Accounting, Banking, Typewriting, and Data Science.">
+    <meta name="keywords" content="M. Vijay, Certifications, Tally Prime, CPBFI, Power BI, Python, Typewriting">
+    <meta name="author" content="M. Vijay">
+    <meta property="og:title" content="Certifications - M. Vijay">
+    <meta property="og:description" content="View the professional certifications and training completed by M. Vijay.">
+    <meta property="og:type" content="website">
+
+    <style>
+        /* Lightfall Background Canvas styling */
+        #lightfall-canvas-container {
+            position: fixed;
+            inset: 0;
+            z-index: -1;
+            pointer-events: none;
+            width: 100vw;
+            height: 100vh;
+        }
+
+        #lightfall-canvas-container canvas {
+            display: block;
+            width: 100%;
+            height: 100%;
+        }
+
+        /* Interactive 3D Folder Section Styles */
+        .folders-section {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            width: 100%;
+            margin-bottom: 5rem;
+        }
+
+        .folders-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            gap: 4rem;
+            width: 100%;
+            max-width: 1100px;
+            margin-top: 3rem;
+            justify-items: center;
+        }
+
+        .folder-wrapper {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 1.5rem;
+            height: 380px;
+            position: relative;
+        }
+
+        .folder-title {
+            font-size: 1.25rem;
+            font-weight: 700;
+            text-align: center;
+            color: var(--text-main);
+            transition: color 0.3s ease;
+        }
+
+        .folder-wrapper:hover .folder-title {
+            color: var(--primary);
+        }
+
+        /* The 3D Folder Component */
+        .folder-container {
+            width: 240px;
+            height: 180px;
+            position: relative;
+            cursor: pointer;
+            outline: none;
+        }
+
+        .folder {
+            width: 100%;
+            height: 100%;
+            position: relative;
+            transition: transform 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+            transform-style: preserve-3d;
+        }
+
+        /* Hover animation when closed */
+        .folder-container:hover .folder:not(.open) {
+            transform: translateY(-8px);
+        }
+
+        .folder-container:hover .folder:not(.open) .paper {
+            transform: translate(-50%, -15%); /* Lift fanning papers slightly */
+        }
+
+        .folder-container:hover .folder:not(.open) .folder__front:not(.right) {
+            transform: skew(12deg) scaleY(0.75);
+        }
+
+        .folder-container:hover .folder:not(.open) .folder__front.right {
+            transform: skew(-12deg) scaleY(0.75);
+        }
+
+        /* Open folder state */
+        .folder.open {
+            transform: translateY(-8px);
+        }
+
+        .folder.open .folder__front:not(.right) {
+            transform: skew(15deg) scaleY(0.5);
+            box-shadow: 0 8px 16px rgba(0,0,0,0.5);
+        }
+
+        .folder.open .folder__front.right {
+            transform: skew(-15deg) scaleY(0.5);
+            box-shadow: 0 8px 16px rgba(0,0,0,0.5);
+        }
+
+        /* Folder Back */
+        .folder__back {
+            position: absolute;
+            inset: 0;
+            background: var(--folder-back-color);
+            border-radius: 0 16px 16px 16px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
+            transform-style: preserve-3d;
+        }
+
+        .folder__back::after {
+            position: absolute;
+            z-index: -1;
+            bottom: 98%;
+            left: 0;
+            content: '';
+            width: 70px;
+            height: 20px;
+            background: var(--folder-back-color);
+            border-radius: 8px 8px 0 0;
+        }
+
+        /* Folder Front Flaps (Split-skew 3D flaps) */
+        .folder__front {
+            position: absolute;
+            bottom: 0;
+            height: 100%;
+            background: var(--folder-color);
+            transform-origin: bottom;
+            transition: all 0.4s cubic-bezier(0.25, 0.8, 0.25, 1.1);
+            z-index: 10;
+        }
+
+        .folder__front:not(.right) {
+            left: 0;
+            width: 50.5%;
+            border-radius: 12px 0 0 16px;
+            box-shadow: inset 2px -2px 10px rgba(0,0,0,0.15);
+        }
+
+        .folder__front.right {
+            right: 0;
+            width: 50.5%;
+            border-radius: 0 16px 16px 0;
+            box-shadow: inset -2px -2px 10px rgba(0,0,0,0.15);
+        }
+
+        /* Papers/Files inside Folder (ENHANCED: Holographic Futuristic Glass Slates) */
+        .paper {
+            position: absolute;
+            z-index: 5;
+            bottom: 8%;
+            left: 50%;
+            transform: translate(-50%, 0%);
+            width: 88%;
+            height: 90%;
+            background: rgba(13, 17, 23, 0.75);
+            border: 1.5px solid var(--folder-color);
+            border-radius: 10px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5), inset 0 0 12px rgba(255,255,255,0.05);
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
+            transition: all 0.4s cubic-bezier(0.25, 0.8, 0.25, 1.1);
+            cursor: zoom-in;
+            display: flex;
+            flex-direction: column;
+            padding: 8px;
+            overflow: hidden;
+            will-change: transform;
+        }
+
+        /* Futuristic HUD Bracket Overlays */
+        .paper::before, .paper::after {
+            content: '';
+            position: absolute;
+            width: 12px;
+            height: 12px;
+            border-color: var(--folder-color);
+            border-style: solid;
+            pointer-events: none;
+        }
+
+        .paper::before {
+            top: -1.5px;
+            left: -1.5px;
+            border-width: 2.5px 0 0 2.5px;
+        }
+
+        .paper::after {
+            bottom: -1.5px;
+            right: -1.5px;
+            border-width: 0 2.5px 2.5px 0;
+        }
+
+        /* Stacked paper properties when closed */
+        .paper-1 {
+            width: 82%;
+            height: 85%;
+            z-index: 6;
+            opacity: 0.8;
+        }
+
+        .paper-2 {
+            width: 85%;
+            height: 88%;
+            z-index: 7;
+            opacity: 0.9;
+        }
+
+        .paper-3 {
+            width: 88%;
+            height: 91%;
+            z-index: 8;
+            opacity: 1;
+        }
+
+        /* Papers fanned out positions when folder is open */
+        .folder.open .paper-1 {
+            transform: translate(-120%, -70%) rotateZ(-15deg) translate(var(--magnet-x, 0px), var(--magnet-y, 0px));
+            z-index: 15;
+            opacity: 1;
+        }
+
+        .folder.open .paper-1:hover {
+            transform: translate(-120%, -70%) rotateZ(-15deg) scale(1.12);
+            box-shadow: 0 12px 30px rgba(187, 134, 252, 0.4);
+            border-color: var(--primary);
+            z-index: 20;
+        }
+
+        .folder.open .paper-2 {
+            transform: translate(20%, -70%) rotateZ(15deg) translate(var(--magnet-x, 0px), var(--magnet-y, 0px));
+            z-index: 14;
+            opacity: 1;
+        }
+
+        .folder.open .paper-2:hover {
+            transform: translate(20%, -70%) rotateZ(15deg) scale(1.12);
+            box-shadow: 0 12px 30px rgba(187, 134, 252, 0.4);
+            border-color: var(--primary);
+            z-index: 20;
+        }
+
+        .folder.open .paper-3 {
+            transform: translate(-50%, -95%) rotateZ(5deg) translate(var(--magnet-x, 0px), var(--magnet-y, 0px));
+            z-index: 16;
+            opacity: 1;
+        }
+
+        .folder.open .paper-3:hover {
+            transform: translate(-50%, -95%) rotateZ(5deg) scale(1.12);
+            box-shadow: 0 12px 30px rgba(187, 134, 252, 0.4);
+            border-color: var(--primary);
+            z-index: 20;
+        }
+
+        /* Holographic Document Scan effect overlay on paper */
+        .hologram-scan {
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%), linear-gradient(90deg, rgba(255, 0, 0, 0.06), rgba(0, 255, 0, 0.02), rgba(0, 0, 255, 0.06));
+            background-size: 100% 4px, 6px 100%;
+            pointer-events: none;
+            z-index: 5;
+            opacity: 0.15;
+        }
+
+        /* Certificate Preview content inside fanned paper */
+        .paper-preview {
+            width: 100%;
+            height: 72%;
+            background: rgba(6, 0, 16, 0.9);
+            border-radius: 6px;
+            border: 1px solid rgba(255,255,255,0.1);
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+        }
+
+        .paper-preview img {
+            max-width: 96%;
+            max-height: 96%;
+            object-fit: contain;
+            pointer-events: none;
+            filter: drop-shadow(0 2px 8px rgba(0,0,0,0.5)) saturate(0.9);
+        }
+
+        /* Shiny plastic overlay on the paper preview */
+        .paper-preview::after {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(135deg, rgba(255,255,255,0.12) 0%, rgba(255,255,255,0) 50%, rgba(255,255,255,0.04) 100%);
+        }
+
+        /* Monospace Diagnostical details footer */
+        .paper-footer {
+            height: 28%;
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: flex-start;
+            padding: 4px 6px;
+            color: var(--text-main);
+            font-family: 'Share Tech Mono', monospace;
+            position: relative;
+        }
+
+        .paper-footer .status-line {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            font-size: 0.58rem;
+            color: var(--secondary);
+            margin-bottom: 2px;
+            text-transform: uppercase;
+        }
+
+        .paper-footer .status-dot {
+            width: 5px;
+            height: 5px;
+            background-color: var(--secondary);
+            border-radius: 50%;
+            box-shadow: 0 0 6px var(--secondary);
+            animation: pulse 1.5s infinite alternate;
+        }
+
+        .paper-footer .title {
+            font-size: 0.78rem;
+            font-weight: 700;
+            line-height: 1.1;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            width: 100%;
+            color: var(--text-main);
+        }
+
+        .paper-footer .issuer {
+            font-size: 0.65rem;
+            color: var(--text-muted);
+            margin-top: 1px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            width: 100%;
+        }
+
+        @keyframes pulse {
+            0% { opacity: 0.3; }
+            100% { opacity: 1; }
+        }
+
+        /* Card grid styling */
+        .cert-card-grid {
+            margin-top: 2rem;
+            width: 100%;
+        }
+
+        .cert-card-inner {
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+            justify-content: space-between;
+        }
+
+        .cert-card-header {
+            margin-bottom: 1.2rem;
+        }
+
+        .cert-card-icon {
+            font-size: 2.2rem;
+            margin-bottom: 0.8rem;
+            display: block;
+        }
+
+        .cert-card-title {
+            font-size: 1.15rem;
+            font-weight: 700;
+            line-height: 1.3;
+            margin-bottom: 0.4rem;
+            color: var(--text-main);
+        }
+
+        .cert-card-issuer {
+            color: var(--text-muted);
+            font-size: 0.9rem;
+            margin-bottom: 0.8rem;
+        }
+
+        .cert-card-date {
+            display: inline-block;
+            font-size: 0.8rem;
+            padding: 0.2rem 0.6rem;
+            background: rgba(3, 218, 198, 0.1);
+            color: var(--secondary);
+            border-radius: 12px;
+            margin-bottom: 1rem;
+            font-weight: 600;
+        }
+
+        /* Fullscreen Lightbox Modal */
+        .lightbox-modal {
+            position: fixed;
+            inset: 0;
+            background: rgba(6, 0, 16, 0.94);
+            backdrop-filter: blur(25px);
+            -webkit-backdrop-filter: blur(25px);
+            z-index: 9999;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.4s ease, visibility 0.4s ease;
+        }
+
+        .lightbox-modal.active {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .lightbox-content {
+            position: relative;
+            width: 90%;
+            max-width: 1000px;
+            max-height: 85vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 1.5rem;
+        }
+
+        .lightbox-image-wrapper {
+            background: #060010;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 16px;
+            padding: 10px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.8);
+            max-width: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+        }
+
+        .lightbox-image {
+            max-width: 100%;
+            max-height: 70vh;
+            object-fit: contain;
+            border-radius: 8px;
+        }
+
+        .lightbox-caption {
+            text-align: center;
+            color: var(--text-main);
+            font-family: var(--font-main);
+        }
+
+        .lightbox-caption h4 {
+            font-size: 1.4rem;
+            margin-bottom: 0.3rem;
+            background: var(--gradient);
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .lightbox-caption p {
+            color: var(--text-muted);
+            font-size: 0.95rem;
+        }
+
+        .lightbox-close {
+            position: absolute;
+            top: -3.5rem;
+            right: 0;
+            background: transparent;
+            border: none;
+            color: var(--text-main);
+            cursor: pointer;
+            font-size: 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            transition: color 0.3s ease;
+        }
+
+        .lightbox-close:hover {
+            color: var(--primary);
+        }
+
+        .lightbox-nav-btn {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            background: rgba(22, 27, 34, 0.6);
+            border: 1px solid var(--border-color);
+            color: var(--text-main);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .lightbox-nav-btn:hover {
+            background: var(--gradient);
+            border-color: transparent;
+            color: white;
+            box-shadow: 0 0 15px rgba(187, 134, 252, 0.4);
+        }
+
+        .lightbox-prev { left: -80px; }
+        .lightbox-next { right: -80px; }
+
+        @media (max-width: 1200px) {
+            .lightbox-prev { left: 1rem; }
+            .lightbox-next { right: 1rem; }
+        }
+
+        @media (max-width: 968px) {
+            .folders-grid {
+                grid-template-columns: 1fr;
+                gap: 5rem;
+            }
+            .folder-wrapper {
+                height: 350px;
+            }
+        }
+    </style>
+</head>
+<body style="padding-top: 100px;">
+    <!-- WebGL Lightfall Background Shader Canvas -->
+    <div id="lightfall-canvas-container"></div>
+    
+    <!-- Fallback Blobs (hidden if WebGL works) -->
+    <div class="blob blob-1" id="fallback-blob-1"></div>
+    <div class="blob blob-2" id="fallback-blob-2"></div>
+
+    <header class="scrolled">
+        <nav>
+            <a href="index.html" class="logo">M.Vijay</a>
+            <ul class="nav-links">
+                <li><a href="about.html">About</a></li>
+                <li><a href="education.html">Education</a></li>
+                <li><a href="skills.html">Skills</a></li>
+                <li><a href="experience.html">Experience</a></li>
+                <li><a href="projects.html">Projects</a></li>
+                <li><a href="certifications.html" style="color: var(--primary);">Certifications</a></li>
+                <li><a href="resume.html">Resume</a></li>
+                <li><a href="contact.html">Contact</a></li>
+            </ul>
+            <div class="hamburger">
+                <div class="line"></div>
+                <div class="line"></div>
+                <div class="line"></div>
+            </div>
+        </nav>
+    </header>
+
+    <main>
+        <section id="certifications" class="section slide-up">
+            <h2 class="section-title">Certifications Folders</h2>
+            
+            <p style="text-align: center; color: var(--text-muted); margin-top: -2rem; margin-bottom: 2rem; font-size: 1.05rem;">
+                Click on any folder to open it and view the certificates. Hover to interact, click to zoom in.
+            </p>
+
+            <!-- 3D Folder Container Grid -->
+            <div class="folders-section">
+                <div class="folders-grid">
+                    
+                    <!-- Folder 1: Typing & Keyboard -->
+                    <div class="folder-wrapper">
+                        <div class="folder-container" id="f-container-1" tabindex="0" role="button" aria-expanded="false" aria-label="Typewriting Folder">
+                            <div class="folder" id="folder-1" style="--folder-color: #5227FF; --folder-back-color: #3b19c8; --paper-1: rgba(187,134,252,0.15); --paper-2: rgba(187,134,252,0.2); --paper-3: rgba(187,134,252,0.25);">
+                                <div class="folder__back">
+                                    
+                                    <!-- Paper 1 (Left): English 45 WPM -->
+                                    <div class="paper paper-1" onclick="openLightbox(0)">
+                                        <div class="hologram-scan"></div>
+                                        <div class="paper-preview">
+                                            <img src="https://drive.google.com/thumbnail?id=12I6jlvs1lac5EiLHaRM_WeNTUsaefxUS&sz=w1000" alt="English 45 WPM">
+                                        </div>
+                                        <div class="paper-footer">
+                                            <div class="status-line"><span class="status-dot"></span>secure doc // 001</div>
+                                            <div class="title">English 45 WPM</div>
+                                            <div class="issuer">SYS: Govt Tamil Nadu</div>
+                                        </div>
+                                    </div>
+                                    
+                                    <!-- Paper 2 (Right): Tamil 30 WPM -->
+                                    <div class="paper paper-2" onclick="openLightbox(1)">
+                                        <div class="hologram-scan"></div>
+                                        <div class="paper-preview">
+                                            <img src="https://drive.google.com/thumbnail?id=10wA4xOtxHk36T4ID22hTJJKnSBJzgmUC&sz=w1000" alt="Tamil 30 WPM">
+                                        </div>
+                                        <div class="paper-footer">
+                                            <div class="status-line"><span class="status-dot"></span>secure doc // 002</div>
+                                            <div class="title">Tamil 30 WPM</div>
+                                            <div class="issuer">SYS: Govt Tamil Nadu</div>
+                                        </div>
+                                    </div>
+                                    
+                                    <!-- Paper 3 (Middle): English 30 WPM -->
+                                    <div class="paper paper-3" onclick="openLightbox(2)">
+                                        <div class="hologram-scan"></div>
+                                        <div class="paper-preview">
+                                            <img src="https://drive.google.com/thumbnail?id=1aYzcFZjSjhH2QeELLiyrXiwiBJmBlIaF&sz=w1000" alt="English 30 WPM">
+                                        </div>
+                                        <div class="paper-footer">
+                                            <div class="status-line"><span class="status-dot"></span>secure doc // 003</div>
+                                            <div class="title">English 30 WPM</div>
+                                            <div class="issuer">SYS: Govt Tamil Nadu</div>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="folder__front"></div>
+                                    <div class="folder__front right"></div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="folder-title">Typewriting Board Certs</div>
+                    </div>
+
+                    <!-- Folder 2: Finance & Accounting -->
+                    <div class="folder-wrapper">
+                        <div class="folder-container" id="f-container-2" tabindex="0" role="button" aria-expanded="false" aria-label="Finance Folder">
+                            <div class="folder" id="folder-2" style="--folder-color: #00c2ff; --folder-back-color: #0093c4; --paper-1: rgba(0,194,255,0.15); --paper-2: rgba(0,194,255,0.2); --paper-3: rgba(0,194,255,0.25);">
+                                <div class="folder__back">
+                                    
+                                    <!-- Paper 1 (Left): CPBFI Program -->
+                                    <div class="paper paper-1" onclick="openLightbox(3)">
+                                        <div class="hologram-scan"></div>
+                                        <div class="paper-preview">
+                                            <img src="https://drive.google.com/thumbnail?id=1_L_S3xucktPsRxO8fbKCYDH-jRSQ9CFE&sz=w1000" alt="CPBFI">
+                                        </div>
+                                        <div class="paper-footer">
+                                            <div class="status-line"><span class="status-dot"></span>secure doc // 004</div>
+                                            <div class="title">CPBFI Program</div>
+                                            <div class="issuer">SYS: Bajaj Finserv</div>
+                                        </div>
+                                    </div>
+                                    
+                                    <!-- Paper 2 (Right): HR Workshop -->
+                                    <div class="paper paper-2" onclick="openLightbox(4)">
+                                        <div class="hologram-scan"></div>
+                                        <div class="paper-preview">
+                                            <img src="https://drive.google.com/thumbnail?id=1Aob8xOKneLzWchhLEiXh78nb9EMPRmBv&sz=w1000" alt="HR Workshop">
+                                        </div>
+                                        <div class="paper-footer">
+                                            <div class="status-line"><span class="status-dot"></span>secure doc // 005</div>
+                                            <div class="title">HR Workshop</div>
+                                            <div class="issuer">SYS: Bajaj Finserv</div>
+                                        </div>
+                                    </div>
+                                    
+                                    <!-- Paper 3 (Middle): GST & Accounting -->
+                                    <div class="paper paper-3" onclick="openLightbox(5)">
+                                        <div class="hologram-scan"></div>
+                                        <div class="paper-preview">
+                                            <img src="https://drive.google.com/thumbnail?id=17kmdXffdOZrJoreYFb03ECZUAvrTtf02&sz=w1000" alt="GST Accounting">
+                                        </div>
+                                        <div class="paper-footer">
+                                            <div class="status-line"><span class="status-dot"></span>secure doc // 006</div>
+                                            <div class="title">GST & Accounting</div>
+                                            <div class="issuer">SYS: The Madura College</div>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="folder__front"></div>
+                                    <div class="folder__front right"></div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="folder-title">Banking & Accountancy</div>
+                    </div>
+
+                    <!-- Folder 3: Tech & AI -->
+                    <div class="folder-wrapper">
+                        <div class="folder-container" id="f-container-3" tabindex="0" role="button" aria-expanded="false" aria-label="Tech Folder">
+                            <div class="folder" id="folder-3" style="--folder-color: #ff007a; --folder-back-color: #cc0062; --paper-1: rgba(255,0,122,0.15); --paper-2: rgba(255,0,122,0.2); --paper-3: rgba(255,0,122,0.25);">
+                                <div class="folder__back">
+                                    
+                                    <!-- Paper 1 (Left): Data Science Using Python -->
+                                    <div class="paper paper-1" onclick="openLightbox(6)">
+                                        <div class="hologram-scan"></div>
+                                        <div class="paper-preview">
+                                            <img src="https://drive.google.com/thumbnail?id=1K7EfEH51Sf1oQ8LdxYtNsOYjcRdRQEID&sz=w1000" alt="Python Data Science">
+                                        </div>
+                                        <div class="paper-footer">
+                                            <div class="status-line"><span class="status-dot"></span>secure doc // 007</div>
+                                            <div class="title">Data Science (Python)</div>
+                                            <div class="issuer">SYS: AMU (Swayam)</div>
+                                        </div>
+                                    </div>
+                                    
+                                    <!-- Paper 2 (Right): Power BI -->
+                                    <div class="paper paper-2" onclick="openLightbox(7)">
+                                        <div class="hologram-scan"></div>
+                                        <div class="paper-preview">
+                                            <img src="https://drive.google.com/thumbnail?id=10xoPHoo8NMHrhkjyzmgzkyKCsncDpt3X&sz=w1000" alt="Power BI">
+                                        </div>
+                                        <div class="paper-footer">
+                                            <div class="status-line"><span class="status-dot"></span>secure doc // 008</div>
+                                            <div class="title">Power BI Beginners</div>
+                                            <div class="issuer">SYS: Simplilearn</div>
+                                        </div>
+                                    </div>
+                                    
+                                    <!-- Paper 3 (Middle): Claude Code 101 -->
+                                    <div class="paper paper-3" onclick="openLightbox(8)">
+                                        <div class="hologram-scan"></div>
+                                        <div class="paper-preview">
+                                            <img src="https://drive.google.com/thumbnail?id=1pUj43iWH6M_tipOku9PsTS2PYBw28_ZD&sz=w1000" alt="Claude Code 101">
+                                        </div>
+                                        <div class="paper-footer">
+                                            <div class="status-line"><span class="status-dot"></span>secure doc // 009</div>
+                                            <div class="title">Claude Code 101</div>
+                                            <div class="issuer">SYS: Anthropic</div>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="folder__front"></div>
+                                    <div class="folder__front right"></div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="folder-title">Tech, Python & AI</div>
+                    </div>
+
+                </div>
+            </div>
+
+            <!-- Index of Certificates grid removed by request -->
+
+        </section>
+    </main>
+
+    <!-- Fullscreen Lightbox Modal -->
+    <div class="lightbox-modal" id="lightbox-modal">
+        <div class="lightbox-content">
+            <button class="lightbox-close" id="lightbox-close">✕ Close</button>
+            <button class="lightbox-nav-btn lightbox-prev" id="lightbox-prev" aria-label="Previous image">◀</button>
+            
+            <div class="lightbox-image-wrapper">
+                <img src="" alt="Zoom certificate" class="lightbox-image" id="lightbox-image">
+            </div>
+            
+            <div class="lightbox-caption" id="lightbox-caption">
+                <h4 id="lightbox-title">Certificate Title</h4>
+                <p id="lightbox-meta">Issuer & Date</p>
+            </div>
+            
+            <button class="lightbox-nav-btn lightbox-next" id="lightbox-next" aria-label="Next image">▶</button>
+        </div>
+    </div>
+
+    <footer>
+        <p>&copy; 2026 M. Vijay. Built with passion.</p>
+    </footer>
+
+    <script src="script.js"></script>
+    <script>
+        const certData = [
+            { id: 0, folderId: 1, driveId: "12I6jlvs1lac5EiLHaRM_WeNTUsaefxUS", title: "Senior Grade Typewriting English (45 WPM)", issuer: "Government of Tamil Nadu (Dept of Technical Education)", date: "February 2024", icon: "⌨️" },
+            { id: 1, folderId: 1, driveId: "10wA4xOtxHk36T4ID22hTJJKnSBJzgmUC", title: "Junior Grade Typewriting Tamil (30 WPM)", issuer: "Government of Tamil Nadu (Dept of Technical Education)", date: "February 2024", icon: "✍️" },
+            { id: 2, folderId: 1, driveId: "1aYzcFZjSjhH2QeELLiyrXiwiBJmBlIaF", title: "Junior Grade Typewriting English (30 WPM)", issuer: "Government of Tamil Nadu (Dept of Technical Education)", date: "August 2022", icon: "⌨️" },
+            { id: 3, folderId: 2, driveId: "1_L_S3xucktPsRxO8fbKCYDH-jRSQ9CFE", title: "Banking, Finance & Insurance (CPBFI)", issuer: "Bajaj Finserv Limited (CIEL Program)", date: "Dec 2024 - Feb 2025", icon: "💼" },
+            { id: 4, folderId: 2, driveId: "1Aob8xOKneLzWchhLEiXh78nb9EMPRmBv", title: "HR Workshop (CPBFI Course)", issuer: "Bajaj Finserv Limited", date: "Dec 2024 - Feb 2025", icon: "🤝" },
+            { id: 5, folderId: 2, driveId: "17kmdXffdOZrJoreYFb03ECZUAvrTtf02", title: "GST & Accounting Package Course", issuer: "The Madura College (PG & Research Dept of Commerce)", date: "Academic Year 2023-24", icon: "📊" },
+            { id: 6, folderId: 3, driveId: "1K7EfEH51Sf1oQ8LdxYtNsOYjcRdRQEID", title: "Data Science Using Python (Swayam)", issuer: "Aligarh Muslim University (AMU/NPTEL)", date: "Jul - Oct 2024", icon: "🐍" },
+            { id: 7, folderId: 3, driveId: "10xoPHoo8NMHrhkjyzmgzkyKCsncDpt3X", title: "Power BI for Beginners", issuer: "Simplilearn (in collaboration with Microsoft)", date: "November 2025", icon: "📈" },
+            { id: 8, folderId: 3, driveId: "1pUj43iWH6M_tipOku9PsTS2PYBw28_ZD", title: "Claude Code 101", issuer: "Anthropic Developer Education", date: "2026", icon: "🤖" }
+        ];
+
+        // --- 3D FOLDER INTERACTIONS --- //
+        document.querySelectorAll('.folder-container').forEach(container => {
+            const folder = container.querySelector('.folder');
+            
+            // Toggle open on click
+            container.addEventListener('click', (e) => {
+                if (e.target.closest('.paper')) return;
+
+                const isOpen = folder.classList.contains('open');
+                
+                // Close all folders
+                document.querySelectorAll('.folder').forEach(f => {
+                    f.classList.remove('open');
+                    f.parentElement.setAttribute('aria-expanded', 'false');
+                });
+                
+                if (!isOpen) {
+                    folder.classList.add('open');
+                    container.setAttribute('aria-expanded', 'true');
+                }
+                
+                // Reset offsets
+                folder.querySelectorAll('.paper').forEach(paper => {
+                    paper.style.setProperty('--magnet-x', '0px');
+                    paper.style.setProperty('--magnet-y', '0px');
+                });
+            });
+
+            // Keyboards Enter/Space
+            container.addEventListener('keydown', (e) => {
+                if (e.key === 'Enter' || e.key === ' ') {
+                    e.preventDefault();
+                    container.click();
+                }
+            });
+
+            // Magnet hover on open fanned papers
+            const papers = folder.querySelectorAll('.paper');
+            papers.forEach((paper) => {
+                paper.addEventListener('mousemove', (e) => {
+                    if (!folder.classList.contains('open')) return;
+                    
+                    const rect = paper.getBoundingClientRect();
+                    const centerX = rect.left + rect.width / 2;
+                    const centerY = rect.top + rect.height / 2;
+                    
+                    const offsetX = (e.clientX - centerX) * 0.15;
+                    const offsetY = (e.clientY - centerY) * 0.15;
+                    
+                    paper.style.setProperty('--magnet-x', `${offsetX}px`);
+                    paper.style.setProperty('--magnet-y', `${offsetY}px`);
+                });
+
+                paper.addEventListener('mouseleave', () => {
+                    paper.style.setProperty('--magnet-x', '0px');
+                    paper.style.setProperty('--magnet-y', '0px');
+                });
+            });
+        });
+
+        // --- GRID INDEX RENDERING REMOVED --- //
+
+        // --- FULLSCREEN LIGHTBOX MODAL --- //
+        let activeLightboxIdx = 0;
+        const modal = document.getElementById('lightbox-modal');
+        const modalImg = document.getElementById('lightbox-image');
+        const modalTitle = document.getElementById('lightbox-title');
+        const modalMeta = document.getElementById('lightbox-meta');
+
+        function openLightbox(idx) {
+            activeLightboxIdx = idx;
+            updateLightboxContent();
+            modal.classList.add('active');
+            
+            document.body.style.overflow = 'hidden';
+            if (window.lenis) window.lenis.stop();
+        }
+
+        function closeLightbox() {
+            modal.classList.remove('active');
+            
+            document.body.style.overflow = '';
+            if (window.lenis) window.lenis.start();
+        }
+
+        function updateLightboxContent() {
+            const data = certData[activeLightboxIdx];
+            modalImg.src = `https://drive.google.com/thumbnail?id=${data.driveId}&sz=w1000`;
+            modalImg.onerror = function() {
+                this.src = 'profile.jpg';
+            };
+            modalTitle.innerText = data.title;
+            modalMeta.innerText = `${data.issuer} • ${data.date}`;
+        }
+
+        document.getElementById('lightbox-close').addEventListener('click', closeLightbox);
+        document.getElementById('lightbox-prev').addEventListener('click', () => {
+            activeLightboxIdx = (activeLightboxIdx - 1 + certData.length) % certData.length;
+            updateLightboxContent();
+        });
+        document.getElementById('lightbox-next').addEventListener('click', () => {
+            activeLightboxIdx = (activeLightboxIdx + 1) % certData.length;
+            updateLightboxContent();
+        });
+
+        modal.addEventListener('click', (e) => {
+            if (e.target === modal || e.target.closest('.lightbox-content') === null) {
+                if (!e.target.classList.contains('lightbox-nav-btn')) {
+                    closeLightbox();
+                }
+            }
+        });
+
+        document.addEventListener('keydown', (e) => {
+            if (modal.classList.contains('active')) {
+                if (e.key === 'Escape') {
+                    closeLightbox();
+                } else if (e.key === 'ArrowLeft') {
+                    activeLightboxIdx = (activeLightboxIdx - 1 + certData.length) % certData.length;
+                    updateLightboxContent();
+                } else if (e.key === 'ArrowRight') {
+                    activeLightboxIdx = (activeLightboxIdx + 1) % certData.length;
+                    updateLightboxContent();
+                }
+            }
+        });
+
+        // --- WEBGL LIGHTFALL BACKGROUND SHADER (Pure Vanilla WebGL - no external library) --- //
+        function initLightfall() {
+            const container = document.getElementById('lightfall-canvas-container');
+            if (!container) return;
+
+            // Hide fallback background blobs
+            const blob1 = document.getElementById('fallback-blob-1');
+            const blob2 = document.getElementById('fallback-blob-2');
+            if (blob1) blob1.style.display = 'none';
+            if (blob2) blob2.style.display = 'none';
+
+            try {
+                const canvas = document.createElement('canvas');
+                container.appendChild(canvas);
+                const gl = canvas.getContext('webgl') || canvas.getContext('experimental-webgl');
+                if (!gl) { throw new Error('WebGL not supported'); }
+
+                // Shader settings
+                const colors = ['#A6C8FF', '#5227FF', '#FF9FFC'];
+                const backgroundColor = '#0A29FF';
+                const speed = 0.5;
+                const streakCount = 2;
+                const streakWidth = 1.0;
+                const streakLength = 1.0;
+                const glow = 1.0;
+                const density = 0.6;
+                const twinkle = 1.0;
+                const zoom = 3.0;
+                const backgroundGlow = 0.5;
+                const opacity = 1.0;
+                const mouseInteraction = true;
+                const mouseStrength = 0.5;
+                const mouseRadius = 1.0;
+                const mouseDampening = 0.15;
+
+                const hexToRGB = hex => {
+                    const c = hex.replace('#', '').padEnd(6, '0');
+                    return [
+                        parseInt(c.slice(0, 2), 16) / 255,
+                        parseInt(c.slice(2, 4), 16) / 255,
+                        parseInt(c.slice(4, 6), 16) / 255
+                    ];
+                };
+
+                const MAX_COLORS = 8;
+                const baseColors = colors.slice(0, MAX_COLORS);
+                const count = baseColors.length;
+                const arr = [];
+                for (let i = 0; i < MAX_COLORS; i++) {
+                    arr.push(hexToRGB(baseColors[Math.min(i, baseColors.length - 1)]));
+                }
+                const avg = [0, 0, 0];
+                for (let i = 0; i < count; i++) {
+                    avg[0] += arr[i][0]; avg[1] += arr[i][1]; avg[2] += arr[i][2];
+                }
+                avg[0] /= count; avg[1] /= count; avg[2] /= count;
+
+                const vertSrc = `
+                    attribute vec2 aPosition;
+                    varying vec2 vUv;
+                    void main() {
+                        vUv = aPosition * 0.5 + 0.5;
+                        gl_Position = vec4(aPosition, 0.0, 1.0);
+                    }
+                `;
+
+                const fragSrc = `
+                    precision highp float;
+                    uniform vec3  iResolution;
+                    uniform vec2  iMouse;
+                    uniform float iTime;
+                    uniform vec3  uColor0; uniform vec3 uColor1; uniform vec3 uColor2; uniform vec3 uColor3;
+                    uniform vec3  uColor4; uniform vec3 uColor5; uniform vec3 uColor6; uniform vec3 uColor7;
+                    uniform float uColorCount;
+                    uniform vec3  uBgColor;
+                    uniform vec3  uMouseColor;
+                    uniform float uSpeed;
+                    uniform float uStreakCount;
+                    uniform float uStreakWidth;
+                    uniform float uStreakLength;
+                    uniform float uGlow;
+                    uniform float uDensity;
+                    uniform float uTwinkle;
+                    uniform float uZoom;
+                    uniform float uBgGlow;
+                    uniform float uOpacity;
+                    uniform float uMouseEnabled;
+                    uniform float uMouseStrength;
+                    uniform float uMouseRadius;
+                    varying vec2 vUv;
+
+                    vec3 palette(float h) {
+                        float idx = floor(clamp(h, 0.0, 0.999999) * uColorCount);
+                        if (idx <= 0.0) return uColor0;
+                        if (idx <= 1.0) return uColor1;
+                        if (idx <= 2.0) return uColor2;
+                        if (idx <= 3.0) return uColor3;
+                        if (idx <= 4.0) return uColor4;
+                        if (idx <= 5.0) return uColor5;
+                        if (idx <= 6.0) return uColor6;
+                        return uColor7;
+                    }
+
+                    vec3 tanhv(vec3 x) {
+                        vec3 e = exp(-2.0 * x);
+                        return (1.0 - e) / (1.0 + e);
+                    }
+
+                    vec2 sceneC(vec2 frag, vec2 r) {
+                        vec2 P = (frag + frag - r) / r.x;
+                        float z = 0.0; float d = 1e3;
+                        vec4 O = vec4(0.0);
+                        for (int k = 0; k < 39; k++) {
+                            vec4 Onew = z * normalize(vec4(P, uZoom, 0.0)) - vec4(0.0, 4.0, 1.0, 0.0) / 4.5;
+                            float dnew = 1.0 - sqrt(dot(Onew, Onew));
+                            if (d > 1e-4) { O = Onew; d = dnew; z += dnew; }
+                        }
+                        return vec2(O.x, atan(O.z, O.y));
+                    }
+
+                    void main() {
+                        vec2 r = iResolution.xy;
+                        vec2 C = vUv * r;
+                        vec2 uv0 = (C + C - r) / r.x;
+                        float T = 0.1 * iTime * uSpeed + 9.0;
+                        float angRings = max(1.0, floor(6.28318530718 * max(uDensity, 0.05) + 0.5));
+                        vec2 Y = vec2(5e-3, 6.28318530718 / angRings);
+
+                        vec2 c0 = sceneC(C, r);
+                        vec2 cdx = sceneC(C + vec2(1.0, 0.0), r);
+                        vec2 cdy = sceneC(C + vec2(0.0, 1.0), r);
+                        vec2 dCx = cdx - c0; vec2 dCy = cdy - c0;
+                        dCx.y -= 6.28318530718 * floor(dCx.y / 6.28318530718 + 0.5);
+                        dCy.y -= 6.28318530718 * floor(dCy.y / 6.28318530718 + 0.5);
+                        vec2 fw = abs(dCx) + abs(dCy);
+                        C = c0;
+
+                        vec2 P2 = vec2(2.0, 1.0) * uv0 - (r / r.x) * vec2(0.0, 1.0);
+                        vec4 O = vec4(uBgColor * 90.0 * uBgGlow / (1e3 * dot(P2, P2) + 6.0), 0.0);
+
+                        float mGlow = 0.0;
+                        if (uMouseEnabled > 0.5) {
+                            vec2 mN = (iMouse + iMouse - r) / r.x;
+                            float md = length(uv0 - mN);
+                            mGlow = exp(-md * md / max(uMouseRadius * uMouseRadius, 1e-4)) * uMouseStrength;
+                            O.rgb += uMouseColor * mGlow * 0.25;
+                        }
+
+                        float zr = 5e-4 * uStreakWidth;
+                        vec2 rr = vec2(max(length(fw), 1e-5));
+                        float tail = 19.0 / max(uStreakLength, 0.05);
+
+                        for (int m = 0; m < 16; m++) {
+                            float mf = float(m);
+                            if (mf >= uStreakCount) break;
+                            float jf = float(m) + 1.0;
+                            float ic = fract(sin(dot(vec2(jf, floor(C.x / Y.x + 0.5)), vec2(7.0, 11.0)) * 73.0));
+                            vec2 Pp = C - (T + T * ic) * vec2(0.0, 1.0);
+                            Pp -= floor(Pp / Y + 0.5) * Y;
+                            float h = fract(8663.0 * ic);
+                            vec3 col = palette(h);
+                            float weight = mix(1.5, 1.0 + sin(T + 7.0 * h + 4.0), uTwinkle);
+                            weight *= (1.0 + mGlow * 2.0);
+                            vec2 inner = vec2(length(max(Pp, vec2(-1.0, 0.0))), length(Pp) - zr) - zr;
+                            vec2 sm = vec2(1.0) - smoothstep(-rr, rr, inner);
+                            O.rgb += dot(sm, vec2(exp(tail * Pp.y), 3.0)) * col * weight;
+                            C.x += Y.x / 8.0;
+                        }
+
+                        vec3 colr = sqrt(tanhv(max(O.rgb * uGlow - vec3(0.04, 0.08, 0.02), 0.0)));
+                        gl_FragColor = vec4(colr, uOpacity);
+                    }
+                `;
+
+                // Compile shaders
+                function compileShader(type, source) {
+                    const shader = gl.createShader(type);
+                    gl.shaderSource(shader, source);
+                    gl.compileShader(shader);
+                    if (!gl.getShaderParameter(shader, gl.COMPILE_STATUS)) {
+                        throw new Error('Shader compile error: ' + gl.getShaderInfoLog(shader));
+                    }
+                    return shader;
+                }
+
+                const vert = compileShader(gl.VERTEX_SHADER, vertSrc);
+                const frag = compileShader(gl.FRAGMENT_SHADER, fragSrc);
+                const program = gl.createProgram();
+                gl.attachShader(program, vert);
+                gl.attachShader(program, frag);
+                gl.linkProgram(program);
+                if (!gl.getProgramParameter(program, gl.LINK_STATUS)) {
+                    throw new Error('Program link error: ' + gl.getProgramInfoLog(program));
+                }
+                gl.useProgram(program);
+
+                // Full-screen triangle geometry
+                const positions = new Float32Array([-1, -1,  3, -1,  -1,  3]);
+                const buf = gl.createBuffer();
+                gl.bindBuffer(gl.ARRAY_BUFFER, buf);
+                gl.bufferData(gl.ARRAY_BUFFER, positions, gl.STATIC_DRAW);
+                const aPos = gl.getAttribLocation(program, 'aPosition');
+                gl.enableVertexAttribArray(aPos);
+                gl.vertexAttribPointer(aPos, 2, gl.FLOAT, false, 0, 0);
+
+                // Collect uniform locations
+                const U = {};
+                const uNames = [
+                    'iResolution','iMouse','iTime',
+                    'uColor0','uColor1','uColor2','uColor3','uColor4','uColor5','uColor6','uColor7',
+                    'uColorCount','uBgColor','uMouseColor','uSpeed','uStreakCount','uStreakWidth',
+                    'uStreakLength','uGlow','uDensity','uTwinkle','uZoom','uBgGlow','uOpacity',
+                    'uMouseEnabled','uMouseStrength','uMouseRadius'
+                ];
+                uNames.forEach(n => U[n] = gl.getUniformLocation(program, n));
+
+                // Set static uniforms
+                gl.uniform1f(U.uColorCount, count);
+                gl.uniform3fv(U.uColor0, arr[0]); gl.uniform3fv(U.uColor1, arr[1]);
+                gl.uniform3fv(U.uColor2, arr[2]); gl.uniform3fv(U.uColor3, arr[3]);
+                gl.uniform3fv(U.uColor4, arr[4]); gl.uniform3fv(U.uColor5, arr[5]);
+                gl.uniform3fv(U.uColor6, arr[6]); gl.uniform3fv(U.uColor7, arr[7]);
+                gl.uniform3fv(U.uBgColor, hexToRGB(backgroundColor));
+                gl.uniform3fv(U.uMouseColor, avg);
+                gl.uniform1f(U.uSpeed, speed);
+                gl.uniform1f(U.uStreakCount, Math.max(1, Math.min(16, Math.round(streakCount))));
+                gl.uniform1f(U.uStreakWidth, streakWidth);
+                gl.uniform1f(U.uStreakLength, streakLength);
+                gl.uniform1f(U.uGlow, glow);
+                gl.uniform1f(U.uDensity, density);
+                gl.uniform1f(U.uTwinkle, twinkle);
+                gl.uniform1f(U.uZoom, zoom);
+                gl.uniform1f(U.uBgGlow, backgroundGlow);
+                gl.uniform1f(U.uOpacity, opacity);
+                gl.uniform1f(U.uMouseEnabled, mouseInteraction ? 1.0 : 0.0);
+                gl.uniform1f(U.uMouseStrength, mouseStrength);
+                gl.uniform1f(U.uMouseRadius, mouseRadius);
+
+                // Resize handler
+                const dpr = window.devicePixelRatio || 1;
+                const resize = () => {
+                    const w = container.clientWidth * dpr;
+                    const h = container.clientHeight * dpr;
+                    canvas.width = w; canvas.height = h;
+                    canvas.style.width = container.clientWidth + 'px';
+                    canvas.style.height = container.clientHeight + 'px';
+                    gl.viewport(0, 0, w, h);
+                    gl.uniform3f(U.iResolution, w, h, 1);
+                };
+                resize();
+                window.addEventListener('resize', resize);
+
+                // Mouse tracking
+                let mouseTarget = [0, 0];
+                if (mouseInteraction) {
+                    window.addEventListener('pointermove', e => {
+                        const rect = canvas.getBoundingClientRect();
+                        mouseTarget = [
+                            (e.clientX - rect.left) * dpr,
+                            (rect.height - (e.clientY - rect.top)) * dpr
+                        ];
+                    });
+                }
+
+                // Animation loop
+                let curMouse = [0, 0];
+                let lastTime = 0;
+                const loop = (t) => {
+                    requestAnimationFrame(loop);
+                    const dt = Math.min((t - lastTime) / 1000, 0.1);
+                    lastTime = t;
+
+                    if (mouseDampening > 0) {
+                        const factor = Math.min(1, 1 - Math.exp(-dt / Math.max(1e-4, mouseDampening)));
+                        curMouse[0] += (mouseTarget[0] - curMouse[0]) * factor;
+                        curMouse[1] += (mouseTarget[1] - curMouse[1]) * factor;
+                    } else {
+                        curMouse = [...mouseTarget];
+                    }
+
+                    gl.uniform1f(U.iTime, t * 0.001);
+                    gl.uniform2f(U.iMouse, curMouse[0], curMouse[1]);
+                    gl.clear(gl.COLOR_BUFFER_BIT);
+                    gl.drawArrays(gl.TRIANGLES, 0, 3);
+                };
+                requestAnimationFrame(loop);
+
+            } catch (err) {
+                console.error('Failed to initialize WebGL Lightfall background:', err);
+                const blob1 = document.getElementById('fallback-blob-1');
+                const blob2 = document.getElementById('fallback-blob-2');
+                if (blob1) blob1.style.display = 'block';
+                if (blob2) blob2.style.display = 'block';
+            }
+        }
+
+        // Initialize on DOM ready
+        document.addEventListener('DOMContentLoaded', () => {
+            initLightfall();
+            if (typeof initTargetCursor === 'function') {
+                initTargetCursor();
+            }
+        });
+    </script>
+</body>
+</html>
